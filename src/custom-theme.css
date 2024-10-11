@@ -1,0 +1,63 @@
+/* custom-theme.css */
+
+/* Base Material theme (optional) */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Define color variables */
+:root {
+    --primary-color: #3f51b5;  /* Indigo */
+    --accent-color: #ff4081;    /* Pink */
+    --warn-color: #f44336;      /* Red */
+    --background-color: #f5f5f5; /* Light Gray */
+    --surface-color: #ffffff;    /* White */
+    --text-primary: rgba(0, 0, 0, 0.87); /* Black */
+    --text-secondary: rgba(0, 0, 0, 0.54); /* Dark Gray */
+}
+
+/* Global styles */
+body {
+    background-color: var(--background-color);
+    font-family: 'Roboto', sans-serif; /* Using a common Material font */
+    margin: 0;
+    padding: 0;
+}
+
+/* Toolbar styling */
+.mat-toolbar {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Button styling */
+.mat-button {
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.mat-button:hover {
+    background-color: var(--accent-color);
+}
+
+/* Card styling */
+.mat-card {
+    background-color: var(--surface-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+/* Input styling */
+.mat-form-field {
+    width: 100%; /* Full width for inputs */
+}
+
+/* Text styles */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    margin: 0 0 16px;
+}
+
+p {
+    color: var(--text-secondary);
+}

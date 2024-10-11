@@ -1,0 +1,12 @@
+mat-card {
+    padding: 1rem;
+}
+
+mat-form-field,
+textarea {
+    width: 100%;
+}
+
+.post-button {
+    width: 200px
+}
