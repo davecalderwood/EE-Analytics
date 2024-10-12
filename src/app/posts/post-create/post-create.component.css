@@ -10,3 +10,7 @@ textarea {
 .post-button {
     width: 200px
 }
+
+mat-spinner {
+    margin: auto;
+}
