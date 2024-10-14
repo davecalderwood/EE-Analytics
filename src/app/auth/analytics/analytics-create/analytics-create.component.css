@@ -1,0 +1,16 @@
+mat-card {
+    padding: 1rem;
+}
+
+mat-form-field,
+textarea {
+    width: 100%;
+}
+
+.analytics-button {
+    width: 200px
+}
+
+mat-spinner {
+    margin: auto;
+}

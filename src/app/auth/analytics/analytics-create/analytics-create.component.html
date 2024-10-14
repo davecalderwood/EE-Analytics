@@ -1,0 +1,12 @@
+<mat-card>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form [formGroup]="form" (submit)="onSaveAnalytics()" *ngIf="!isLoading">
+        <mat-form-field>
+            <textarea matInput rows="10" formControlName="content" name="content" placeholder="Content"></textarea>
+            <mat-error *ngIf="form.get('content')?.invalid">
+                Please enter correctly formatted Analytics data.
+            </mat-error>
+        </mat-form-field>
+        <button mat-raised-button class="analytics-button" color="accent" type="submit">Save New Analytics</button>
+    </form>
+</mat-card>
