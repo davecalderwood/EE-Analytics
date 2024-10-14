@@ -1,7 +1,7 @@
-<div *ngIf="characters.length">
-    <p>Number of Characters: {{ characters.length }}</p>
-    <ul>
-        <li *ngFor="let character of characters">{{ character.characterName }}</li>
-        <!-- Adjust according to your character's structure -->
-    </ul>
+<div *ngIf="isLoading" class="loading">
+    Loading data...
+</div>
+
+<div *ngIf="!isLoading && barChartData">
+    <app-graph [chartData]="barChartData" [chartType]="'bar'"></app-graph>
 </div>
