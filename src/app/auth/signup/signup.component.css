@@ -1,0 +1,15 @@
+mat-card {
+    padding: 1rem;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.signup-button {
+    width: 200px
+}
+
+mat-spinner {
+    margin: auto;
+}
