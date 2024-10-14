@@ -1,7 +1,7 @@
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { mimeType } from './mime-type.validator';
+import { mimeType } from '../../mime-type.validator';
 import { PostsService } from '../posts.service';
 import { SharedModule } from '../../shared.module';
 import { Subscription } from 'rxjs';
