@@ -10,8 +10,8 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { SignupComponent } from './app/auth/signup/signup.component';
 import { ErorInterceptor } from './app/error/error-interceptor';
-import { AnalyticsCreateComponent } from './app/auth/analytics/analytics-create/analytics-create.component';
-import { AnalyticsDisplayComponent } from './app/auth/analytics/analytics-display/analytics-display.component';
+import { AnalyticsCreateComponent } from './app/analytics/analytics-create/analytics-create.component';
+import { AnalyticsDisplayComponent } from './app/analytics/analytics-display/analytics-display.component';
 
 const routes = [
   { path: '', component: PostListComponent },

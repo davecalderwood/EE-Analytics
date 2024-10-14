@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from '../../../shared.module';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { AuthService } from '../../auth.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AnalyticsService } from '../analytics.service';
+import { SharedModule } from '../../shared.module';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-analytics-create',

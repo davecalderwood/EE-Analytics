@@ -5,7 +5,7 @@ import { AnalyticsData, CharacterUsed, WeaponUpgrade } from "./analytics.model";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 
-import { environment } from "../../../environment/environment"
+import { environment } from "../../environment/environment"
 const BACKEND_URL = environment.apiURL + '/analytics/';
 
 @Injectable({ providedIn: 'root' })
@@ -16,9 +16,9 @@ export class AnalyticsService {
     constructor(private http: HttpClient, private router: Router) { }
 
     // Method to fetch analytics data with pagination
-    getAnalyticsData(itemsPerPage: number, currentPage: number) {
-        const queryParams = `?pageSize=${itemsPerPage}&page=${currentPage}`;
-        this.http.get<{ message: string, analytics: any, maxData: number }>(BACKEND_URL + queryParams)
+    getAnalyticsData() {
+        //const queryParams = `?pageSize=${itemsPerPage}&page=${currentPage}`;
+        this.http.get<{ message: string, analytics: any, maxData: number }>(BACKEND_URL)
             .pipe(map((analyticsData) => {
                 return {
                     analyticsData: analyticsData.analytics.map((data: any) => {
