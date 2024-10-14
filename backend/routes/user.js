@@ -22,7 +22,7 @@ router.post('/signup', (req, res, next) => {
             })
             .catch(error => {
                 res.status(500).json({
-                    error: error
+                    message: 'Invalid authentication credentials!'
                 });
             });
     });
@@ -63,7 +63,7 @@ router.post('/login', (req, res, next) => {
         .catch(error => {
             console.log(error);
             return res.status(401).json({
-                message: "Authentication Failed"
+                message: 'Invalid authentication credentials!'
             });
         })
 })

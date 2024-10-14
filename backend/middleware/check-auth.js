@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         next();
     } catch (error) {
         res.status(401).json({
-            message: "Authentication Failed while getting token."
+            message: "Authentication Failed while getting token. You are not authenticated."
         })
     }
 }

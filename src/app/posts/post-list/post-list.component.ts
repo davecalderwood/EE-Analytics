@@ -1,25 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { CommonModule } from '@angular/common';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatButtonModule } from '@angular/material/button';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
-import { RouterModule } from '@angular/router';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { AuthService } from '../../auth/auth.service';
+import { SharedModule } from '../../shared.module';
 
 @Component({
   selector: 'app-post-list',
   standalone: true,
   imports: [
-    MatExpansionModule,
-    CommonModule,
-    MatButtonModule,
-    RouterModule,
-    MatProgressSpinnerModule,
-    MatPaginatorModule
+    SharedModule
   ],
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css'
@@ -66,9 +57,15 @@ export class PostListComponent implements OnInit, OnDestroy {
   onDelete(postId: string) {
     this.isLoading = true;
     this.postsService.deletePost(postId)
-      .subscribe(() => {
-        this.postsService.getPosts(this.postsPerPage, this.currentPage);
-      })
+      .subscribe({
+        next: () => {
+          this.postsService.getPosts(this.postsPerPage, this.currentPage);
+          this.isLoading = false; // Reset loading state after successful deletion
+        },
+        error: () => {
+          this.isLoading = false; // Reset loading state on error
+        }
+      });
   }
 
   ngOnDestroy(): void {

@@ -1,31 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, NgForm, FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { PostsService } from '../posts.service';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { mimeType } from './mime-type.validator';
+import { PostsService } from '../posts.service';
+import { SharedModule } from '../../shared.module';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
     selector: 'app-post-create',
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatInputModule,
-        MatCardModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatProgressSpinnerModule
+        SharedModule
     ],
     templateUrl: './post-create.component.html',
     styleUrl: './post-create.component.css'
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
     enteredTitle = '';
     enteredContent = '';
     private mode = 'create';
@@ -34,10 +25,22 @@ export class PostCreateComponent implements OnInit {
     isLoading = false;
     form!: FormGroup;
     imagePreview!: string;
+    private authStatusSub!: Subscription;
 
-    constructor(public postsService: PostsService, public route: ActivatedRoute) { }
+    constructor(
+        public postsService: PostsService,
+        public route: ActivatedRoute,
+        private authService: AuthService
+    ) { }
 
     ngOnInit() {
+        this.authStatusSub = this.authService
+            .getAuthStatusListener()
+            .subscribe(
+                authStatus => {
+                    this.isLoading = false;
+                }
+            );
         this.form = new FormGroup({
             'title': new FormControl(null, { validators: [Validators.required] }),
             'content': new FormControl(null, { validators: [Validators.required] }),
@@ -105,5 +108,9 @@ export class PostCreateComponent implements OnInit {
             )
         }
         this.form.reset();
+    }
+
+    ngOnDestroy() {
+        this.authStatusSub.unsubscribe();
     }
 }
