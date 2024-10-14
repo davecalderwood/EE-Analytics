@@ -1,7 +1,35 @@
 <div *ngIf="isLoading" class="loading">
-    Loading data...
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Loading data...</p>
 </div>
 
-<div *ngIf="!isLoading && barChartData">
-    <app-graph [chartData]="barChartData" [chartType]="'bar'"></app-graph>
+<!-- Container for all charts -->
+<div class="charts-container">
+    <!-- Character Play Count Chart -->
+    <mat-card class="chart-card mat-elevation-z4">
+        <mat-card-header>
+            <mat-card-title>Character Play Count</mat-card-title>
+            <mat-card-subtitle>See how often each character is used</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div *ngIf="!isLoading && barChartData" class="chart-wrapper">
+                <app-graph [chartData]="barChartData" [chartType]="'bar'"></app-graph>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Character Survival Time Chart -->
+    <mat-card class="chart-card mat-elevation-z4">
+        <mat-card-header>
+            <mat-card-title>Character Survival Time</mat-card-title>
+            <mat-card-subtitle>Analyze how long each character survives on average</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div *ngIf="!isLoading && timeSurvivedChartData" class="chart-wrapper">
+                <app-graph [chartData]="timeSurvivedChartData" [chartType]="'bar'"></app-graph>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Add more charts as needed -->
 </div>
