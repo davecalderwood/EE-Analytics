@@ -1,10 +1,10 @@
-<mat-toolbar color="primary">
-    <span><a mat-button routerLink="/" routerLinkActive="mat-accent">Analytics</a></span>
+<mat-toolbar color="primary" class="header-toolbar">
+    <span><a mat-button routerLink="/" routerLinkActive="mat-accent">Eldritch Escape</a></span>
     <span class="spacer"></span>
     <ul>
-        <li *ngIf="userIsAuthenticated">
+        <!-- <li *ngIf="userIsAuthenticated">
             <a mat-button routerLink="/create" routerLinkActive="mat-accent">New Post</a>
-        </li>
+        </li> -->
         <li *ngIf="!userIsAuthenticated">
             <a mat-button routerLink="/login" routerLinkActive="mat-accent">Login</a>
         </li>

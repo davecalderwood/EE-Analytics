@@ -1,0 +1,71 @@
+$primary-color: #009688; // Teal color
+$hover-color: #00796b; // Darker teal for hover effect
+$active-color: #009688; // Bright teal for active links
+$inactive-color: #45a59b; // Grayish color for inactive links
+$background-color: #272727;
+$text-color: #e0e0e0;
+
+body {
+    background-color: $background-color;
+    color: $text-color;
+    font-family: 'Roboto', sans-serif;
+}
+
+.sidenav-container {
+    height: 100vh;
+}
+
+.sidenav {
+    width: 250px;
+    background: darken($background-color, 5%);
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    transition: width 0.3s;
+}
+
+.sidenav h2 {
+    margin-bottom: 1rem;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.sidenav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidenav li {
+    margin: 0.5rem 0;
+}
+
+.sidenav a {
+    text-decoration: none;
+    background-color: transparent; // No background for inactive links
+    padding: 0.75rem 1rem; // Padding for button-like feel
+    border-radius: 4px; // Round corners for a softer look
+    display: block; // Make the entire area of the link clickable
+    color: $inactive-color; // Grayish color for inactive links
+    transition: background-color 0.3s, color 0.3s; // Smooth transition for hover and active effects
+
+    // Hover effect for all links
+    &:hover {
+        background-color: $hover-color; // Highlight on hover
+        color: #ffffff; // Change text color to white on hover
+    }
+
+    // Active state for the currently active link
+    &.active {
+        background-color: $active-color; // Bright teal for active link
+        color: #ffffff; // Keep text color white for active link
+    }
+}
+
+.content {
+    padding: 1rem;
+    background: $background-color;
+}
+
+main {
+    width: 100%;
+    margin: 0;
+}

@@ -9,6 +9,7 @@ import { SharedModule } from '../../shared.module';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 import { GraphComponent } from '../../shared/graph/graph.component';
+import { CharacterKPI } from '../../interfaces';
 
 @Component({
   selector: 'app-analytics-display',
@@ -19,21 +20,33 @@ import { GraphComponent } from '../../shared/graph/graph.component';
     GraphComponent
   ],
   templateUrl: './analytics-display.component.html',
-  styleUrls: ['./analytics-display.component.css'],
+  styleUrls: ['./analytics-display.component.scss'],
 })
 export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
+  // Data properties
   analytics: AnalyticsData[] = [];
-  analyticsLoaded = false;
-  barChartData!: ChartData<'bar'>;
   characters: Character[] = [];
+
+  // Loading states
+  analyticsLoaded = false;
   charactersLoaded = false;
   isLoading = false;
+
+  // Chart data properties
+  barChartData!: ChartData<'line'>;
+  timeSurvivedChartData!: ChartData<'line'>;
+
+  // User authentication properties
+  userId!: string;
+  userIsAuthenticated = false;
+
+  // KPI data
+  averagePlayPercentages: CharacterKPI[] = [];
+
+  // Subscription properties
   private analyticsSub!: Subscription;
   private authStatusSubs!: Subscription;
   private characterSub!: Subscription;
-  timeSurvivedChartData!: ChartData<'bar'>;
-  userId!: string;
-  userIsAuthenticated = false;
 
   constructor(
     public analyticsService: AnalyticsService,
@@ -79,6 +92,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     if (this.analyticsLoaded && this.charactersLoaded) {
       this.characterPlayCountData();
       this.characterTimeSurvivedData();
+      this.averagePlayPercentages = this.calculateAveragePlayPercentage();
     }
   }
 
@@ -103,9 +117,11 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
         data: this.characters
           .filter(character => character.primaryWeapon)
           .map(character => dataCounts[character.characterGUID] || 0),
-        backgroundColor: this.characters
+        fill: false, // Important for line charts
+        borderColor: this.characters
           .filter(character => character.primaryWeapon)
           .map(character => `#${character.color}`),
+        tension: 0.1 // This controls the curve of the line
       }]
     };
   }
@@ -144,11 +160,45 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
             const usageCount = usageCounts[character.characterGUID] || 1; // Prevent division by zero
             return (totalSurvived / usageCount) / 60; // Convert seconds to minutes
           }),
-        backgroundColor: this.characters
+        fill: false, // Important for line charts
+        borderColor: this.characters
           .filter(character => character.primaryWeapon)
           .map(character => `#${character.color}`),
+        tension: 0.1 // This controls the curve of the line
       }]
     };
+  }
+
+  private calculateAveragePlayPercentage(): CharacterKPI[] {
+    const playCounts: { [key: string]: number } = {};
+
+    // Calculate total play counts for each character
+    this.analytics.forEach((analyticsData) => {
+      analyticsData.charactersUsed.forEach((character) => {
+        const matchedCharacter = this.characters.find(c => c.characterGUID === character.characterGUID);
+        if (matchedCharacter && matchedCharacter.primaryWeapon) {
+          playCounts[matchedCharacter.characterGUID] =
+            (playCounts[matchedCharacter.characterGUID] || 0) + 1;
+        }
+      });
+    });
+
+    // Calculate total plays across all primary characters
+    const totalPlays = Object.values(playCounts).reduce((sum, count) => sum + count, 0);
+
+    // Prepare the average play percentage data
+    return this.characters
+      .filter(character => character.primaryWeapon)
+      .map(character => {
+        const totalPlaysForCharacter = playCounts[character.characterGUID] || 0;
+        const averagePlayPercentage = totalPlays > 0 ? (totalPlaysForCharacter / totalPlays) * 100 : 0;
+
+        return {
+          characterName: character.characterName,
+          averagePlayPercentage: averagePlayPercentage,
+          characterColor: character.color,
+        };
+      });
   }
 
   onDelete(postId: string) {

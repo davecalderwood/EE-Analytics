@@ -1,0 +1,43 @@
+.header-toolbar {
+    background-color: #161616; // Dark background color to match the theme
+    color: #e0e0e0; // Light text color for contrast
+
+    a {
+        color: #009688; // Teal color for links
+        text-decoration: none;
+        margin: 0;
+        padding: 0.75rem 1rem; // Padding for better button-like appearance
+        border-radius: 4px; // Rounded corners for links
+        transition: background-color 0.3s; // Smooth transition for hover effects
+
+        &:hover {
+            background-color: #00796b; // Darker teal on hover
+            color: #ffffff; // Change text color on hover
+        }
+
+        &.mat-accent {
+            background-color: #009688; // Active teal color
+            color: #ffffff; // Ensure text color is white for visibility
+
+            &:hover {
+                background-color: #00796b; // Keep the hover effect for active link
+            }
+        }
+    }
+
+    .spacer {
+        flex: 1 1 auto; // Spacer to push items to the right
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+
+        li {
+            margin-left: 1rem; // Add space between links
+        }
+    }
+}

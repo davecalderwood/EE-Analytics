@@ -1,4 +1,22 @@
 <app-header></app-header>
-<main>
-    <router-outlet></router-outlet>
-</main>
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav class="sidenav" mode="side" opened>
+        <h2>Navigation</h2>
+        <ul>
+            <li>
+                <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+            </li>
+            <li>
+                <a routerLink="/analytics" routerLinkActive="active">Analytics</a>
+            </li>
+            <li>
+                <a routerLink="/create" routerLinkActive="active">Create Post</a>
+            </li>
+        </ul>
+    </mat-sidenav>
+    <mat-sidenav-content class="content">
+        <main>
+            <router-outlet></router-outlet>
+        </main>
+    </mat-sidenav-content>
+</mat-sidenav-container>
