@@ -33,8 +33,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   isLoading = false;
 
   // Chart data properties
-  barChartData!: ChartData<'line'>;
-  timeSurvivedChartData!: ChartData<'line'>;
+  timeSurvivedChartData!: ChartData<'bar'>;
 
   // User authentication properties
   userId!: string;
@@ -90,40 +89,9 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
   private tryUpdateCharts() {
     if (this.analyticsLoaded && this.charactersLoaded) {
-      this.characterPlayCountData();
       this.characterTimeSurvivedData();
       this.averagePlayPercentages = this.calculateAveragePlayPercentage();
     }
-  }
-
-  private characterPlayCountData() {
-    const dataCounts: { [key: string]: number } = {};
-
-    this.analytics.forEach((analyticsData) => {
-      analyticsData.charactersUsed.forEach((character) => {
-        const matchedCharacter = this.characters.find(c => c.characterGUID === character.characterGUID);
-        if (matchedCharacter && matchedCharacter.primaryWeapon) {
-          dataCounts[matchedCharacter.characterGUID] = (dataCounts[matchedCharacter.characterGUID] || 0) + 1;
-        }
-      });
-    });
-
-    this.barChartData = {
-      labels: this.characters
-        .filter(character => character.primaryWeapon)
-        .map(character => character.characterName),
-      datasets: [{
-        label: 'Character Play Count',
-        data: this.characters
-          .filter(character => character.primaryWeapon)
-          .map(character => dataCounts[character.characterGUID] || 0),
-        fill: false, // Important for line charts
-        borderColor: this.characters
-          .filter(character => character.primaryWeapon)
-          .map(character => `#${character.color}`),
-        tension: 0.1 // This controls the curve of the line
-      }]
-    };
   }
 
   private characterTimeSurvivedData() {
@@ -146,7 +114,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
       });
     });
 
-    // Prepare the chart data
+    // Prepare the chart data for a bar chart
     this.timeSurvivedChartData = {
       labels: this.characters
         .filter(character => character.primaryWeapon)
@@ -160,11 +128,13 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
             const usageCount = usageCounts[character.characterGUID] || 1; // Prevent division by zero
             return (totalSurvived / usageCount) / 60; // Convert seconds to minutes
           }),
-        fill: false, // Important for line charts
+        backgroundColor: this.characters
+          .filter(character => character.primaryWeapon)
+          .map(character => `#${character.color}`), // Set character color for the bars
         borderColor: this.characters
           .filter(character => character.primaryWeapon)
-          .map(character => `#${character.color}`),
-        tension: 0.1 // This controls the curve of the line
+          .map(character => `#${character.color}`), // Solid border color for each bar
+        borderWidth: 1 // Width of the bar borders
       }]
     };
   }
