@@ -1,53 +1,55 @@
-<form [formGroup]="form" (submit)="onSaveCharacter()" *ngIf="!isLoading">
-    <mat-form-field appearance="fill">
-        <mat-label>Character Name</mat-label>
-        <input matInput type="text" formControlName="characterName" placeholder="Character Name">
-        <mat-error *ngIf="form.get('characterName')?.invalid && form.get('characterName')?.touched">
-            Please enter a character name.
-        </mat-error>
-    </mat-form-field>
+<mat-card>
+    <form [formGroup]="form" (submit)="onSaveCharacter()" *ngIf="!isLoading">
+        <mat-form-field appearance="fill">
+            <mat-label>Character Name</mat-label>
+            <input matInput type="text" formControlName="characterName" placeholder="Character Name">
+            <mat-error *ngIf="form.get('characterName')?.invalid && form.get('characterName')?.touched">
+                Please enter a character name.
+            </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill">
-        <mat-label>Weapon Name</mat-label>
-        <input matInput type="text" formControlName="weaponName" placeholder="Weapon Name">
-        <mat-error *ngIf="form.get('weaponName')?.invalid && form.get('weaponName')?.touched">
-            Please enter a weapon name.
-        </mat-error>
-    </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Weapon Name</mat-label>
+            <input matInput type="text" formControlName="weaponName" placeholder="Weapon Name">
+            <mat-error *ngIf="form.get('weaponName')?.invalid && form.get('weaponName')?.touched">
+                Please enter a weapon name.
+            </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill">
-        <mat-label>Character GUID</mat-label>
-        <input matInput type="text" formControlName="characterGUID" placeholder="Character GUID">
-        <mat-error *ngIf="form.get('characterGUID')?.invalid && form.get('characterGUID')?.touched">
-            Please enter a character GUID.
-        </mat-error>
-    </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Character GUID</mat-label>
+            <input matInput type="text" formControlName="characterGUID" placeholder="Character GUID">
+            <mat-error *ngIf="form.get('characterGUID')?.invalid && form.get('characterGUID')?.touched">
+                Please enter a character GUID.
+            </mat-error>
+        </mat-form-field>
 
-    <mat-checkbox formControlName="primaryWeapon">
-        Primary Weapon
-    </mat-checkbox>
+        <mat-checkbox formControlName="primaryWeapon">
+            Primary Weapon
+        </mat-checkbox>
 
-    <!-- Image Input Field -->
-    <div>
-        <button mat-stroked-button type="button" (click)="filePicker.click()">Select Image</button>
-        <input type="file" #filePicker (change)="onImagePicked($event)" hidden>
-        <mat-error *ngIf="form.get('image')?.invalid && form.get('image')?.touched">
-            Please upload an image.
-        </mat-error>
-    </div>
+        <!-- Image Input Field -->
+        <div>
+            <button mat-stroked-button type="button" (click)="filePicker.click()">Select Image</button>
+            <input type="file" #filePicker (change)="onImagePicked($event)" hidden>
+            <mat-error *ngIf="form.get('image')?.invalid && form.get('image')?.touched">
+                Please upload an image.
+            </mat-error>
+        </div>
 
-    <div class="image-preview" *ngIf="imagePreview && form.get('image')?.valid">
-        <img [src]="imagePreview" [alt]="form.value.characterName" style="max-width: 100%; height: auto;">
-    </div>
-    <br>
+        <div class="image-preview" *ngIf="imagePreview && form.get('image')?.valid">
+            <img [src]="imagePreview" [alt]="form.value.characterName" style="max-width: 100%; height: auto;">
+        </div>
+        <br>
 
-    <mat-form-field appearance="fill">
-        <mat-label>Character Color</mat-label>
-        <input matInput type="text" formControlName="color" placeholder="Character Color">
-        <mat-error *ngIf="form.get('color')?.invalid && form.get('color')?.touched">
-            Please enter a character color.
-        </mat-error>
-    </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Character Color</mat-label>
+            <input matInput type="text" formControlName="color" placeholder="Character Color">
+            <mat-error *ngIf="form.get('color')?.invalid && form.get('color')?.touched">
+                Please enter a character color.
+            </mat-error>
+        </mat-form-field>
 
-    <button mat-raised-button class="post-button" color="accent" type="submit">Save Character</button>
-</form>
+        <button mat-raised-button class="post-button" color="accent" type="submit">Save Character</button>
+    </form>
+</mat-card>

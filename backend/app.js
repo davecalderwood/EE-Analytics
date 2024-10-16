@@ -7,6 +7,7 @@ const postsRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
 const analyticsRoutes = require('./routes/analytics');
 const charactersRoutes = require('./routes/characters');
+const equipmentRoutes = require('./routes/equipment');
 
 const app = express();
 
@@ -37,5 +38,6 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/characters', charactersRoutes);
+app.use('/api/equipment', equipmentRoutes);
 
 module.exports = app;

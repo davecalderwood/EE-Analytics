@@ -13,6 +13,7 @@ import { ErorInterceptor } from './app/error/error-interceptor';
 import { AnalyticsCreateComponent } from './app/analytics/analytics-create/analytics-create.component';
 import { AnalyticsDisplayComponent } from './app/analytics/analytics-display/analytics-display.component';
 import { CharactersComponent } from './app/characters/characters.component';
+import { EquipmentComponent } from './app/equipment/equipment.component';
 
 const routes = [
   { path: '', component: PostListComponent },
@@ -27,6 +28,9 @@ const routes = [
   // Characters
   { path: 'createCharacter', component: CharactersComponent, canActivate: [AuthGuard] },
   { path: 'edit/:characterId', component: CharactersComponent, canActivate: [AuthGuard] },
+  // Equipment
+  { path: 'createEquipment', component: EquipmentComponent, canActivate: [AuthGuard] },
+  { path: 'edit/:equipmentId', component: EquipmentComponent, canActivate: [AuthGuard] },
 ];
 
 bootstrapApplication(AppComponent, {

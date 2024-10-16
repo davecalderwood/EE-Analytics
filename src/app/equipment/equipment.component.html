@@ -1,0 +1,43 @@
+<mat-card>
+    <form [formGroup]="form" (submit)="onSaveEquipment()" *ngIf="!isLoading">
+        <mat-form-field appearance="fill">
+            <mat-label>Equipment Name</mat-label>
+            <input matInput type="text" formControlName="equipmentName" placeholder="Equipment Name">
+            <mat-error *ngIf="form.get('equipmentName')?.invalid && form.get('equipmentName')?.touched">
+                Please enter an equipment name.
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Equipment Tier</mat-label>
+            <input matInput type="text" formControlName="equipmentTier" placeholder="Equipment Tier">
+            <mat-error *ngIf="form.get('equipmentTier')?.invalid && form.get('equipmentTier')?.touched">
+                Please enter an equipment Tier.
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Equipment GUID</mat-label>
+            <input matInput type="text" formControlName="equipmentGUID" placeholder="Equipment GUID">
+            <mat-error *ngIf="form.get('equipmentGUID')?.invalid && form.get('equipmentGUID')?.touched">
+                Please enter a character GUID.
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Image Input Field -->
+        <div>
+            <button mat-stroked-button type="button" (click)="filePicker.click()">Select Image</button>
+            <input type="file" #filePicker (change)="onImagePicked($event)" hidden>
+            <mat-error *ngIf="form.get('image')?.invalid && form.get('image')?.touched">
+                Please upload an image.
+            </mat-error>
+        </div>
+
+        <div class="image-preview" *ngIf="imagePreview && form.get('image')?.valid">
+            <img [src]="imagePreview" [alt]="form.value.equipmentName" style="max-width: 100%; height: auto;">
+        </div>
+        <br>
+
+        <button mat-raised-button class="post-button" color="accent" type="submit">Save Equipment</button>
+    </form>
+</mat-card>
