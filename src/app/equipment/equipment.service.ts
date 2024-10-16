@@ -17,18 +17,18 @@ export class EquipmentService {
     constructor(private http: HttpClient, private router: Router) { }
 
     // Fetch equipment from the backend
-    getCharacters() {
+    getAllEquipment() {
         this.http.get<{ message: string; equipment: any }>(BACKEND_URL)
             .pipe(map((equipmentData) => {
                 return {
-                    equipment: equipmentData.equipment.map((character: any) => {
+                    equipment: equipmentData.equipment.map((equipment: any) => {
                         return {
-                            id: character._id,
-                            equipmentGUID: character.equipmentGUID,
-                            equipmentName: character.equipmentName,
-                            equipmentTier: character.equipmentTier,
-                            imagePath: character.imagePath,
-                            creator: character.creator
+                            id: equipment._id,
+                            equipmentGUID: equipment.equipmentGUID,
+                            equipmentName: equipment.equipmentName,
+                            equipmentTier: equipment.equipmentTier,
+                            imagePath: equipment.imagePath,
+                            creator: equipment.creator
                         };
                     }),
                     equipmentCount: equipmentData.equipment.length
@@ -43,13 +43,13 @@ export class EquipmentService {
             });
     }
 
-    // Get an observable for character updates
-    getCharacterUpdateListener() {
+    // Get an observable for equipment updates
+    getEquipmentUpdateListener() {
         return this.equipmentUpdated.asObservable();
     }
 
-    // Fetch a specific character by ID
-    getCharacter(id: string) {
+    // Fetch a specific equipment by ID
+    getEquipment(id: string) {
         return this.http.get<{
             _id: string;
             equipmentGUID: string;
@@ -60,22 +60,22 @@ export class EquipmentService {
         }>(BACKEND_URL + id);
     }
 
-    // Add a new character
-    addCharacter(equipmentGUID: string, equipmentName: string, equipmentTier: string, image: File) {
+    // Add a new equipment
+    addEquipment(equipmentGUID: string, equipmentName: string, equipmentTier: string, image: File) {
         const equipmentData = new FormData();
         equipmentData.append('equipmentGUID', equipmentGUID);
         equipmentData.append('equipmentName', equipmentName);
         equipmentData.append('equipmentTier', equipmentTier);
         equipmentData.append('image', image, equipmentName);
 
-        this.http.post<{ message: string; character: Equipment }>(BACKEND_URL, equipmentData)
+        this.http.post<{ message: string; equipment: Equipment }>(BACKEND_URL, equipmentData)
             .subscribe(() => {
                 this.router.navigate(['/']);
             });
     }
 
-    // Update an existing character
-    updateCharacter(id: string, equipmentGUID: string, equipmentName: string, equipmentTier: string, image: File | string) {
+    // Update an existing equipment
+    updateEquipment(id: string, equipmentGUID: string, equipmentName: string, equipmentTier: string, image: File | string) {
         let equipmentData: Equipment | FormData;
         if (typeof (image) === 'object') {
             equipmentData = new FormData();
@@ -101,8 +101,8 @@ export class EquipmentService {
             });
     }
 
-    // Delete a character by ID
-    deleteCharacter(characterId: string) {
-        return this.http.delete<{ message: string }>(BACKEND_URL + characterId);
+    // Delete a equipment by ID
+    deleteEquipment(equipmentId: string) {
+        return this.http.delete<{ message: string }>(BACKEND_URL + equipmentId);
     }
 }

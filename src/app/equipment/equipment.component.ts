@@ -51,7 +51,7 @@ export class EquipmentComponent implements OnInit, OnDestroy {
         this.mode = 'edit';
         this.equipmentId = paramMap.get('equipmentId');
         this.isLoading = true;
-        this.equipmentService.getCharacter(this.equipmentId).subscribe((equipmentData: any) => {
+        this.equipmentService.getEquipment(this.equipmentId).subscribe((equipmentData: any) => {
           this.equipment = {
             id: equipmentData._id,
             equipmentName: equipmentData.equipmentName,
@@ -101,14 +101,14 @@ export class EquipmentComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     if (this.mode === 'create') {
-      this.equipmentService.addCharacter(
+      this.equipmentService.addEquipment(
         this.form.value.equipmentGUID,
         this.form.value.equipmentName,
         this.form.value.equipmentTier,
         this.form.value.image
       );
     } else {
-      this.equipmentService.updateCharacter(
+      this.equipmentService.updateEquipment(
         this.equipmentId,
         this.form.value.equipmentGUID,
         this.form.value.equipmentName,

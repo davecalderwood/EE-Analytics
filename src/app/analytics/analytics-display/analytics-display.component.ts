@@ -10,6 +10,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 import { GraphComponent } from '../../shared/graph/graph.component';
 import { CharacterKPI } from '../../interfaces';
+import { EquipmentService } from '../../equipment/equipment.service';
+import { Equipment } from '../../equipment/equipment.model';
 
 @Component({
   selector: 'app-analytics-display',
@@ -26,10 +28,12 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   // Data properties
   analytics: AnalyticsData[] = [];
   characters: Character[] = [];
+  equipment: Equipment[] = [];
 
   // Loading states
   analyticsLoaded = false;
   charactersLoaded = false;
+  equipmentLoaded = false;
   isLoading = false;
 
   // Chart data properties
@@ -46,10 +50,12 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   private analyticsSub!: Subscription;
   private authStatusSubs!: Subscription;
   private characterSub!: Subscription;
+  private equipmentSub!: Subscription;
 
   constructor(
     public analyticsService: AnalyticsService,
     public characterService: CharacterService,
+    public equipmentService: EquipmentService,
     private authService: AuthService,
   ) { }
 
@@ -59,6 +65,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     this.userId = this.authService.getUserId();
     this.analyticsService.getAnalyticsData();
     this.characterService.getCharacters();
+    this.equipmentService.getAllEquipment();
 
     // Analytics
     this.analyticsSub = this.analyticsService.getAnalyticsUpdateListener()
@@ -78,6 +85,15 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
         this.tryUpdateCharts();
       });
 
+    // Equipment
+    this.equipmentSub = this.equipmentService.getEquipmentUpdateListener()
+      .subscribe(({ equipment, equipmentCount }: { equipment: Equipment[]; equipmentCount: number }) => {
+        this.equipment = equipment;
+        this.equipmentLoaded = true;
+        this.isLoading = false;
+        this.tryUpdateCharts();
+      });
+
     // Authentication
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authStatusSubs = this.authService.getAuthStatusListener()
@@ -88,7 +104,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   }
 
   private tryUpdateCharts() {
-    if (this.analyticsLoaded && this.charactersLoaded) {
+    if (this.analyticsLoaded && this.charactersLoaded && this.equipmentLoaded) {
       this.characterTimeSurvivedData();
       this.averagePlayPercentages = this.calculateAveragePlayPercentage();
     }
@@ -188,6 +204,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.analyticsSub.unsubscribe();
     this.characterSub.unsubscribe();
+    this.equipmentSub.unsubscribe();
     this.authStatusSubs.unsubscribe();
   }
 }
