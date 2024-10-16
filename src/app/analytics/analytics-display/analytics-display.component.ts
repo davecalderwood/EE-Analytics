@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AnalyticsService } from '../analytics.service';
-import { AnalyticsData } from '../analytics.model';
+import { AnalyticsData, CharacterUsed } from '../analytics.model';
 import { AuthService } from '../../auth/auth.service';
 import { Character } from '../../characters/character.model';
 import { CharacterService } from '../../characters/character.service';
@@ -38,6 +38,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
   // Chart data properties
   timeSurvivedChartData!: ChartData<'bar'>;
+  heatMapChartData: any;
 
   // User authentication properties
   userId!: string;
@@ -107,6 +108,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     if (this.analyticsLoaded && this.charactersLoaded && this.equipmentLoaded) {
       this.characterTimeSurvivedData();
       this.averagePlayPercentages = this.calculateAveragePlayPercentage();
+      this.heatMapChartData = this.prepareHeatMapChartData();
     }
   }
 
@@ -186,6 +188,62 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
         };
       });
   }
+
+  private generateHeatMapData() {
+    const heatMapData: { [equipmentName: string]: { successfulExtractions: number; usageCount: number } } = {};
+
+    this.analytics.forEach((analyticsData) => {
+      analyticsData.charactersUsed.forEach((character: CharacterUsed) => {
+        const equipmentUsed = character.equipment?.map(e => e.equipmentName) || [];
+
+        // Accumulate data for each piece of equipment used
+        equipmentUsed.forEach(equipmentName => {
+          if (!heatMapData[equipmentName]) {
+            heatMapData[equipmentName] = { successfulExtractions: 0, usageCount: 0 };
+          }
+
+          // Update successful extractions and usage count
+          heatMapData[equipmentName]['successfulExtractions'] += analyticsData.successfullyExtracted ? 1 : 0;
+          heatMapData[equipmentName]['usageCount']++;
+        });
+      });
+    });
+
+    return heatMapData;
+  }
+
+  private prepareHeatMapChartData() {
+    const heatMapData = this.generateHeatMapData();
+
+    const labelsX: string[] = []; // Equipment Names
+    const labelsY: string[] = ['Successful Extractions'];
+    const datasets: number[][] = [];
+
+    Object.keys(heatMapData).forEach((equipmentName) => {
+      const data = heatMapData[equipmentName];
+      labelsX.push(equipmentName);
+      datasets.push([
+        data['successfulExtractions'] // Total successful extractions
+      ]);
+    });
+
+    // Map the data into a format for a heatmap plugin
+    return {
+      labels: {
+        x: labelsX,
+        y: labelsY
+      },
+      datasets: [{
+        data: datasets,
+        backgroundColor: (context: any) => {
+          const value = context.dataset.data[context.dataIndex][0]; // Get the successful extractions count
+          const alpha = Math.min(1, Math.max(0, value / 100)); // Adjust alpha based on value
+          return `rgba(255, 99, 132, ${alpha})`;
+        }
+      }]
+    };
+  }
+
 
   onDelete(postId: string) {
     this.isLoading = true;

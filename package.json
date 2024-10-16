@@ -24,6 +24,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "chart.js": "^4.4.4",
+    "chartjs-chart-matrix": "^2.0.1",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.0.0",

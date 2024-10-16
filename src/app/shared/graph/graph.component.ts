@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { SharedModule } from '../../shared.module';
 import { Chart, registerables } from 'chart.js';
+import { MatrixController, MatrixElement } from 'chartjs-chart-matrix';
 
 @Component({
   selector: 'app-graph',
@@ -14,8 +15,8 @@ import { Chart, registerables } from 'chart.js';
 export class GraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   @Input() chartData: any;
-  @Input() chartType: 'bar' | 'line' | 'pie' = 'bar'; // Default to bar chart
-  private chart!: Chart<'bar' | 'line' | 'pie', number[]>;
+  @Input() chartType: 'bar' | 'line' | 'pie' | 'heatmap' = 'bar';
+  private chart!: Chart<'bar' | 'line' | 'pie' | 'matrix'>;
 
   ngAfterViewInit(): void {
     this.createChart();
@@ -23,18 +24,55 @@ export class GraphComponent implements AfterViewInit, OnDestroy {
 
   createChart() {
     Chart.register(...registerables);
-    this.chart = new Chart(this.chartCanvas.nativeElement, {
-      type: this.chartType,
-      data: this.chartData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
+    Chart.register(MatrixController, MatrixElement);
+
+    if (this.chartType === 'heatmap') {
+      // Create heatmap chart using the `matrix` plugin
+      this.chart = new Chart(this.chartCanvas.nativeElement, {
+        type: 'matrix', // 'matrix' is used to create a heatmap chart
+        data: this.chartData,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+            },
+            tooltip: {
+              callbacks: {
+                label: (context: any) => {
+                  const value = context.raw;
+                  return `Value: ${value}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'category',
+              labels: this.chartData.labels.x,
+            },
+            y: {
+              type: 'category',
+              labels: this.chartData.labels.y,
+            },
           }
         }
-      }
-    });
+      });
+    } else {
+      // Handle other chart types (bar, line, pie)
+      this.chart = new Chart(this.chartCanvas.nativeElement, {
+        type: this.chartType,
+        data: this.chartData,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+            }
+          }
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
