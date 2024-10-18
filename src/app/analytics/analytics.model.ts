@@ -9,16 +9,15 @@ export interface CharacterUsed {
     characterName: string;
     characterGUID: string;
     weaponUpgrades: WeaponUpgrade[];
-    equipment?: Equipment[];
 }
 
 export interface AnalyticsData {
     id: any;
     charactersUsed: CharacterUsed[];
+    equipmentUsed: Equipment[];
     worldName: string;
     timeSurvived: number;
     successfullyExtracted: boolean;
     scrapCount: number;
     levelReached: number;
-    equipmentUsed: any[];
 }

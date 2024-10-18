@@ -9,9 +9,10 @@ import { SharedModule } from '../../shared.module';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData } from 'chart.js';
 import { GraphComponent } from '../../shared/graph/graph.component';
-import { CharacterKPI } from '../../interfaces';
+import { CharacterKPI, CustomScatterChartData } from '../../interfaces';
 import { EquipmentService } from '../../equipment/equipment.service';
 import { Equipment } from '../../equipment/equipment.model';
+import { isPrimaryWeapon } from '../../shared/helperFunctions';
 
 @Component({
   selector: 'app-analytics-display',
@@ -38,7 +39,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
   // Chart data properties
   timeSurvivedChartData!: ChartData<'bar'>;
-  heatMapChartData: any;
+  scatterPlotChartData!: ChartData<'scatter'>;
 
   // User authentication properties
   userId!: string;
@@ -46,6 +47,8 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
   // KPI data
   averagePlayPercentages: CharacterKPI[] = [];
+  bestTeamCombo: any;
+  worstTeamCombo: any;
 
   // Subscription properties
   private analyticsSub!: Subscription;
@@ -71,7 +74,6 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     // Analytics
     this.analyticsSub = this.analyticsService.getAnalyticsUpdateListener()
       .subscribe(({ analyticsData }: { analyticsData: AnalyticsData[]; dataCount: number }) => {
-        console.log(analyticsData)
         this.analytics = analyticsData;
         this.analyticsLoaded = true;
         this.tryUpdateCharts();
@@ -108,7 +110,12 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     if (this.analyticsLoaded && this.charactersLoaded && this.equipmentLoaded) {
       this.characterTimeSurvivedData();
       this.averagePlayPercentages = this.calculateAveragePlayPercentage();
-      this.heatMapChartData = this.prepareHeatMapChartData();
+      this.scatterPlotChartData = this.prepareScatterPlotChartData();
+
+      // Calculate best and worst team combos
+      const { bestTeam, bestTeamScore, worstTeam, worstTeamScore } = this.determineBestAndWorstTeams();
+      this.bestTeamCombo = { team: bestTeam, score: bestTeamScore };
+      this.worstTeamCombo = { team: worstTeam, score: worstTeamScore };
     }
   }
 
@@ -189,61 +196,167 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
       });
   }
 
-  private generateHeatMapData() {
-    const heatMapData: { [equipmentName: string]: { successfulExtractions: number; usageCount: number } } = {};
+  private prepareScatterPlotChartData(): CustomScatterChartData {
+    const scatterData = this.generateScatterData();
+    const datasets = Object.keys(scatterData).map((equipmentName) => {
+      const point = scatterData[equipmentName]; // Access the single object for this equipment
 
-    this.analytics.forEach((analyticsData) => {
-      analyticsData.charactersUsed.forEach((character: CharacterUsed) => {
-        const equipmentUsed = character.equipment?.map(e => e.equipmentName) || [];
-
-        // Accumulate data for each piece of equipment used
-        equipmentUsed.forEach(equipmentName => {
-          if (!heatMapData[equipmentName]) {
-            heatMapData[equipmentName] = { successfulExtractions: 0, usageCount: 0 };
-          }
-
-          // Update successful extractions and usage count
-          heatMapData[equipmentName]['successfulExtractions'] += analyticsData.successfullyExtracted ? 1 : 0;
-          heatMapData[equipmentName]['usageCount']++;
-        });
-      });
+      return {
+        x: point.successfulExtractions,  // Successful extractions on the x-axis
+        y: point.usageCount,              // Usage count on the y-axis
+        equipmentName: equipmentName,     // To label points in tooltips
+        imagePath: point.imagePath         // Include the image path
+      };
     });
 
-    return heatMapData;
-  }
+    // Check if datasets is empty
+    if (datasets.length === 0) {
+      console.log('No datasets available for the scatter plot');
+    }
 
-  private prepareHeatMapChartData() {
-    const heatMapData = this.generateHeatMapData();
-
-    const labelsX: string[] = []; // Equipment Names
-    const labelsY: string[] = ['Successful Extractions'];
-    const datasets: number[][] = [];
-
-    Object.keys(heatMapData).forEach((equipmentName) => {
-      const data = heatMapData[equipmentName];
-      labelsX.push(equipmentName);
-      datasets.push([
-        data['successfulExtractions'] // Total successful extractions
-      ]);
-    });
-
-    // Map the data into a format for a heatmap plugin
     return {
-      labels: {
-        x: labelsX,
-        y: labelsY
-      },
       datasets: [{
+        label: 'Equipment Usage',
         data: datasets,
-        backgroundColor: (context: any) => {
-          const value = context.dataset.data[context.dataIndex][0]; // Get the successful extractions count
-          const alpha = Math.min(1, Math.max(0, value / 100)); // Adjust alpha based on value
-          return `rgba(255, 99, 132, ${alpha})`;
-        }
-      }]
+        showLine: false, // Ensure it's set to false for a scatter plot
+      }],
+      axisLabels: {
+        x: 'Equipment Success',
+        y: 'Equipment Usage'
+      }
     };
   }
 
+  private generateScatterData() {
+    const scatterData: {
+      [equipmentName: string]: {
+        successfulExtractions: number;
+        usageCount: number;
+        imagePath: string;
+      }
+    } = {};
+
+    // Iterate through each analytics data
+    this.analytics.forEach((analyticsData) => {
+      analyticsData.equipmentUsed.forEach((equipment: Equipment) => {
+        const equipmentName = equipment.equipmentName;
+
+        if (!scatterData[equipmentName]) {
+          scatterData[equipmentName] = {
+            successfulExtractions: 0,
+            usageCount: 0,
+            imagePath: equipment.imagePath
+          };
+        }
+
+        // Update successful extractions and usage count
+        scatterData[equipmentName]['successfulExtractions'] += analyticsData.successfullyExtracted ? 1 : 0;
+        scatterData[equipmentName]['usageCount']++;
+      });
+    });
+
+    return scatterData;
+  }
+
+  private determineBestAndWorstTeams() {
+    const teamData = this.generateTeamComboData();
+
+    let bestTeam: string | null = null;
+    let worstTeam: string | null = null;
+    let highestScore = -Infinity;
+    let lowestScore = Infinity;
+
+    Object.keys(teamData).forEach((teamCombo) => {
+      const { totalScore, occurrences } = teamData[teamCombo];
+      const averageScore = totalScore / occurrences;
+
+      if (averageScore > highestScore) {
+        highestScore = averageScore;
+        bestTeam = teamCombo;
+      }
+
+      if (averageScore < lowestScore) {
+        lowestScore = averageScore;
+        worstTeam = teamCombo;
+      }
+    });
+
+    // Assuming you have analytics data for each team
+    const bestTeamAnalytics = this.analytics.find(data =>
+      this.extractPrimaryWeapons(data.charactersUsed) === bestTeam
+    );
+    const worstTeamAnalytics = this.analytics.find(data =>
+      this.extractPrimaryWeapons(data.charactersUsed) === worstTeam
+    );
+
+    this.bestTeamCombo = bestTeamAnalytics ? {
+      team: this.extractPrimaryWeapons(bestTeamAnalytics.charactersUsed),
+      score: highestScore
+    } : null;
+
+    this.worstTeamCombo = worstTeamAnalytics ? {
+      team: this.extractPrimaryWeapons(worstTeamAnalytics.charactersUsed),
+      score: lowestScore
+    } : null;
+
+    return {
+      bestTeam,
+      bestTeamScore: highestScore,
+      worstTeam,
+      worstTeamScore: lowestScore,
+    };
+  }
+
+  // Helper method to extract primary weapons
+  private extractPrimaryWeapons(charactersUsed: CharacterUsed[]): string {
+    if (!this.characters) {
+      return ''; // Return empty if character data isn't loaded yet
+    }
+
+    return charactersUsed
+      .filter(characterUsed => {
+        const matchingCharacter = this.characters.find(
+          char => char.characterGUID === characterUsed.characterGUID // Compare using GUID
+        );
+
+        // Check if this character is identified as a primary weapon in the service data
+        return matchingCharacter && matchingCharacter.primaryWeapon;
+      })
+      .map(character => character.characterName) // Return names of primary weapon characters
+      .join(', ');
+  }
+
+  private generateTeamComboData(): { [teamCombo: string]: { totalScore: number; occurrences: number } } {
+    const teamData: { [teamCombo: string]: { totalScore: number; occurrences: number } } = {};
+
+    this.analytics.forEach((analyticsData, index) => {
+      // Extract characters used based on the characters listed as primary weapons
+      const primaryWeaponCharacters = analyticsData.charactersUsed
+        .filter(characterUsed => isPrimaryWeapon(characterUsed.characterGUID, this.characters))
+        .map(character => character.characterName);
+
+      // Create a unique key for the team
+      const teamCombo = primaryWeaponCharacters.join(', ');
+
+      // Calculate the score based on survival and extraction
+      const score = this.calculateTeamScore(analyticsData.successfullyExtracted, analyticsData.timeSurvived);
+
+      if (!teamData[teamCombo]) {
+        teamData[teamCombo] = { totalScore: 0, occurrences: 0 };
+      }
+
+      teamData[teamCombo].totalScore += score;
+      teamData[teamCombo].occurrences++;
+    });
+
+    return teamData;
+  }
+
+  private calculateTeamScore(successfulExtractions: boolean, survivalTime: number): number {
+    const baseScore = survivalTime; // Base the score on survival time
+    const extractionBonus = successfulExtractions ? 100 : 0; // Add a fixed bonus for successful extraction
+    return baseScore + extractionBonus; // Combine both to get the final score
+  }
 
   onDelete(postId: string) {
     this.isLoading = true;

@@ -15,8 +15,9 @@ import { MatrixController, MatrixElement } from 'chartjs-chart-matrix';
 export class GraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   @Input() chartData: any;
-  @Input() chartType: 'bar' | 'line' | 'pie' | 'heatmap' = 'bar';
-  private chart!: Chart<'bar' | 'line' | 'pie' | 'matrix'>;
+  @Input() chartType: 'bar' | 'line' | 'pie' | 'heatmap' | 'scatter' = 'bar';
+  private chart!: Chart<'bar' | 'line' | 'pie' | 'matrix' | 'scatter'>;
+  @Input() axisLabels!: { x: string, y: string };
 
   ngAfterViewInit(): void {
     this.createChart();
@@ -24,55 +25,87 @@ export class GraphComponent implements AfterViewInit, OnDestroy {
 
   createChart() {
     Chart.register(...registerables);
-    Chart.register(MatrixController, MatrixElement);
 
-    if (this.chartType === 'heatmap') {
-      // Create heatmap chart using the `matrix` plugin
-      this.chart = new Chart(this.chartCanvas.nativeElement, {
-        type: 'matrix', // 'matrix' is used to create a heatmap chart
-        data: this.chartData,
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: true,
-            },
-            tooltip: {
-              callbacks: {
-                label: (context: any) => {
-                  const value = context.raw;
-                  return `Value: ${value}`;
+    // Create the chart based on the chartType
+    switch (this.chartType) {
+      case 'scatter':
+        // Create scatter plot chart
+        this.scatterGraph();
+        break;
+
+      case 'heatmap':
+        // Add heatmap chart configuration here
+        // Example:
+        // this.chart = new Chart(this.chartCanvas.nativeElement, {
+        //     type: 'matrix',
+        //     data: this.chartData,
+        //     options: {
+        //         // Add heatmap specific options
+        //     }
+        // });
+        break;
+
+      default:
+        // Handle other chart types (bar, line, pie)
+        this.chart = new Chart(this.chartCanvas.nativeElement, {
+          type: this.chartType,
+          data: this.chartData,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+              }
+            }
+          }
+        });
+        break;
+    }
+  }
+
+  private scatterGraph() {
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: 'scatter',
+      data: {
+        datasets: this.chartData.datasets // Use the datasets from chartData
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+          },
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const xLabel = context.raw?.x; // Safely access x
+                const yLabel = context.raw?.y; // Safely access y
+
+                if (xLabel !== undefined && yLabel !== undefined) {
+                  return `X: ${xLabel}, Y: ${yLabel}`;
+                } else {
+                  return 'Data not available'; // Handle undefined case
                 }
               }
             }
-          },
-          scales: {
-            x: {
-              type: 'category',
-              labels: this.chartData.labels.x,
-            },
-            y: {
-              type: 'category',
-              labels: this.chartData.labels.y,
-            },
           }
-        }
-      });
-    } else {
-      // Handle other chart types (bar, line, pie)
-      this.chart = new Chart(this.chartCanvas.nativeElement, {
-        type: this.chartType,
-        data: this.chartData,
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
+        },
+        scales: {
+          x: {
+            title: {
               display: true,
+              text: this.chartData.axisLabels.x // Use axisLabels for titles
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: this.chartData.axisLabels.y // Use axisLabels for titles
             }
           }
         }
-      });
-    }
+      }
+    });
   }
 
   ngOnDestroy(): void {

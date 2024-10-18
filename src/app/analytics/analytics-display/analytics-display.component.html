@@ -5,19 +5,52 @@
     </div>
 
     <!-- Container for KPIs -->
-    <div class="kpi-container">
-        <mat-card *ngFor="let kpi of averagePlayPercentages" class="kpi-card mat-elevation-z4"
-            [ngStyle]="{'background-color': '#' + kpi.characterColor}">
-            <mat-card-header>
-                <mat-card-title>{{ kpi.characterName }}</mat-card-title>
-                <mat-card-subtitle>Average Play Percentage</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-                <strong>{{ kpi.averagePlayPercentage.toFixed(2) }}%</strong>
-            </mat-card-content>
-        </mat-card>
-    </div>
+    <div class="kpi-wrapper">
+        <!-- First Row: Average Play Percentages -->
+        <div class="kpi-container kpi-row">
+            <mat-card *ngFor="let kpi of averagePlayPercentages" class="kpi-card mat-elevation-z4"
+                [ngStyle]="{'background-color': '#' + kpi.characterColor}">
+                <mat-card-header>
+                    <mat-card-title>{{ kpi.characterName }}</mat-card-title>
+                    <mat-card-subtitle>Average Play Percentage</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <strong>{{ kpi.averagePlayPercentage.toFixed(2) }}%</strong>
+                </mat-card-content>
+            </mat-card>
+        </div>
 
+        <!-- Second Row: Best & Worst Team Combos -->
+        <div class="kpi-container kpi-row">
+            <mat-card class="kpi-card team-combo-card mat-elevation-z4" *ngIf="bestTeamCombo">
+                <mat-card-header>
+                    <mat-card-title>Best Team Combo</mat-card-title>
+                    <mat-card-subtitle>
+                        <span *ngFor="let weapon of bestTeamCombo.team.split(', '); let i = index">
+                            {{ weapon }}<br *ngIf="i < bestTeamCombo.team.split(', ').length - 1">
+                        </span>
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <strong>Score: {{ bestTeamCombo.score.toFixed(2) }}</strong>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="kpi-card team-combo-card mat-elevation-z4" *ngIf="worstTeamCombo">
+                <mat-card-header>
+                    <mat-card-title>Worst Team Combo</mat-card-title>
+                    <mat-card-subtitle>
+                        <span *ngFor="let weapon of worstTeamCombo.team.split(', '); let i = index">
+                            {{ weapon }}<br *ngIf="i < worstTeamCombo.team.split(', ').length - 1">
+                        </span>
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <strong>Score: {{ worstTeamCombo.score.toFixed(2) }}</strong>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
 
     <!-- Container for all charts -->
     <div class="charts-container">
@@ -33,18 +66,30 @@
                 </div>
             </mat-card-content>
         </mat-card>
+
         <br>
-        <!-- Heat Map for Character & Equipment -->
+
+        <!-- Heat Map for Equipment -->
         <mat-card class="chart-card mat-elevation-z4">
             <mat-card-header>
-                <mat-card-title>Character & Equipment Heat Map</mat-card-title>
-                <mat-card-subtitle>Analyze character and equipment performance</mat-card-subtitle>
+                <mat-card-title>Equipment Scatter Plot</mat-card-title>
+                <mat-card-subtitle>Analyze equipment performance</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-                <div *ngIf="!isLoading && heatMapChartData" class="chart-wrapper">
-                    <app-graph [chartData]="heatMapChartData" [chartType]="'heatmap'"></app-graph>
+                <div *ngIf="isLoading" class="loading-indicator">
+                    Loading data...
+                </div>
+                <div *ngIf="!isLoading && scatterPlotChartData" class="chart-wrapper">
+                    <app-graph 
+                        [chartData]="scatterPlotChartData" 
+                        [chartType]="'scatter'" >
+                    </app-graph>
+                </div>
+                <div *ngIf="!isLoading && !scatterPlotChartData" class="no-data">
+                    No data available for the scatter plot.
                 </div>
             </mat-card-content>
         </mat-card>
+    
     </div>
 </div>

@@ -6,6 +6,7 @@ import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 
 import { environment } from "../../environment/environment"
+import { Equipment } from "../equipment/equipment.model";
 const BACKEND_URL = environment.apiURL + '/analytics/';
 
 @Injectable({ providedIn: 'root' })
@@ -36,7 +37,11 @@ export class AnalyticsService {
                             successfullyExtracted: data.successfullyExtracted,
                             scrapCount: data.scrapCount,
                             levelReached: data.levelReached,
-                            equipmentUsed: data.equipmentUsed
+                            equipmentUsed: data.equipmentUsed.map((equipment: any) => ({
+                                equipmentName: equipment.moduleName,
+                                equipmentGUID: equipment.moduleGUID,
+                                imagePath: equipment.image
+                            })) as Equipment[]
                         } as AnalyticsData;
                     }),
                     maxData: analyticsData.maxData
