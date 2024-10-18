@@ -1,97 +1,65 @@
-<div class="component-wrapper">
-    <div *ngIf="isLoading" class="loading">
-        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
-        <p>Loading data...</p>
-    </div>
+<div class="dashboard">
+    <header class="header">
+      <h1 class="header-title">Analytics</h1>
+      <div class="filter-box">
+        <input type="text" placeholder="Search..." />
+        <button>Filter</button>
+      </div>
+    </header>
+  
+    <div class="kpi-container">
+        <!-- Average play % -->
+      <div class="kpi-box">
+        <h2>Average Play Percentage</h2>
+        <ul>
+            <li *ngFor="let character of averagePlayPercentages">
+                <span [style.color]="'#' + character.characterColor">{{ character.characterName }}: {{ character.averagePlayPercentage | number: '1.0-2' }}%</span>
+            </li>
+        </ul>
+      </div>
 
-    <!-- Container for KPIs -->
-    <div class="kpi-wrapper">
-        <!-- First Row: Average Play Percentages -->
-        <div class="kpi-container kpi-row">
-            <mat-card *ngFor="let kpi of averagePlayPercentages" class="kpi-card mat-elevation-z4"
-                [ngStyle]="{'background-color': '#' + kpi.characterColor}">
-                <mat-card-header>
-                    <mat-card-title>{{ kpi.characterName }}</mat-card-title>
-                    <mat-card-subtitle>Average Play Percentage</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <strong>{{ kpi.averagePlayPercentage.toFixed(2) }}%</strong>
-                </mat-card-content>
-            </mat-card>
+      <div class="kpi-box">KPI 2</div>
+
+        <!-- Best Team Combo -->
+        <div class="kpi-box">
+            <h2>Best Team Combo</h2>
+            <ul>
+                <li *ngFor="let character of bestTeamCombo.characters">
+                    <span [style.color]="'#' + bestTeamCombo.teamColor">{{ character }}</span>
+                </li>
+            </ul>
+            <p>Score: {{ bestTeamCombo.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
         </div>
 
-        <br>
-
-        <!-- Second Row: Best & Worst Team Combos -->
-        <div class="kpi-container kpi-row">
-            <mat-card class="kpi-card team-combo-card mat-elevation-z4" *ngIf="bestTeamCombo">
-                <mat-card-header>
-                    <mat-card-title>Best Team Combo</mat-card-title>
-                    <mat-card-subtitle>
-                        <span *ngFor="let weapon of bestTeamCombo.team.split(', '); let i = index">
-                            {{ weapon }}<br *ngIf="i < bestTeamCombo.team.split(', ').length - 1">
-                        </span>
-                    </mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <strong>Score: {{ bestTeamCombo.score.toFixed(2) }}</strong>
-                </mat-card-content>
-            </mat-card>
-
-            <mat-card class="kpi-card team-combo-card mat-elevation-z4" *ngIf="worstTeamCombo">
-                <mat-card-header>
-                    <mat-card-title>Worst Team Combo</mat-card-title>
-                    <mat-card-subtitle>
-                        <span *ngFor="let weapon of worstTeamCombo.team.split(', '); let i = index">
-                            {{ weapon }}<br *ngIf="i < worstTeamCombo.team.split(', ').length - 1">
-                        </span>
-                    </mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <strong>Score: {{ worstTeamCombo.score.toFixed(2) }}</strong>
-                </mat-card-content>
-            </mat-card>
+        <!-- Worst Team Combo -->
+        <div class="kpi-box">
+            <h2>Worst Team Combo</h2>
+            <ul>
+                <li *ngFor="let character of worstTeamCombo.characters">
+                    <span [style.color]="'#' + worstTeamCombo.teamColor">{{ character }}</span>
+                </li>
+            </ul>
+            <p>Score: {{ worstTeamCombo.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
         </div>
     </div>
-
-    <div class="charts-container">
-        <!-- Container for both charts to display them side by side -->
-        <div class="charts-row">
-            <!-- Character Survival Time -->
-            <mat-card class="chart-card mat-elevation-z4">
-                <mat-card-header>
-                    <mat-card-title>Character Survival Time</mat-card-title>
-                    <mat-card-subtitle>See how long each character survives on average</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <div *ngIf="!isLoading && timeSurvivedChartData" class="chart-wrapper">
-                        <app-graph [chartData]="timeSurvivedChartData" [chartType]="'bar'"></app-graph>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-    
-            <!-- Heat Map for Equipment -->
-            <mat-card class="chart-card mat-elevation-z4">
-                <mat-card-header>
-                    <mat-card-title>Equipment Scatter Plot</mat-card-title>
-                    <mat-card-subtitle>Analyze equipment performance</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <div *ngIf="isLoading" class="loading-indicator">
-                        Loading data...
-                    </div>
-                    <div *ngIf="!isLoading && scatterPlotChartData" class="chart-wrapper">
-                        <app-graph 
-                            [chartData]="scatterPlotChartData" 
-                            [chartType]="'scatter'" >
-                        </app-graph>
-                    </div>
-                    <div *ngIf="!isLoading && !scatterPlotChartData" class="no-data">
-                        No data available for the scatter plot.
-                    </div>
-                </mat-card-content>
-            </mat-card>
+  
+    <div class="large-box-container">
+        <div class="large-box">
+          <h2>Average Survival Time</h2>
+        <div *ngIf="!isLoading && timeSurvivedChartData" class="chart-wrapper">
+            <app-graph [chartData]="timeSurvivedChartData" [chartType]="'bar'"></app-graph>
         </div>
+      </div>
+
+      <div class="large-box">
+        <h2>Equipment Usage</h2>
+        <div *ngIf="!isLoading && scatterPlotChartData" class="chart-wrapper">
+            <app-graph 
+                [chartData]="scatterPlotChartData" 
+                [chartType]="'scatter'" >
+            </app-graph>
+        </div>
+      </div>
     </div>
-    
-</div>
+  </div>
+  

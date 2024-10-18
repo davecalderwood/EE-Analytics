@@ -114,8 +114,16 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
       // Calculate best and worst team combos
       const { bestTeam, bestTeamScore, worstTeam, worstTeamScore } = this.determineBestAndWorstTeams();
-      this.bestTeamCombo = { team: bestTeam, score: bestTeamScore };
-      this.worstTeamCombo = { team: worstTeam, score: worstTeamScore };
+      this.bestTeamCombo = {
+        characters: bestTeam,
+        score: bestTeamScore,
+        teamColor: '28A745' // Customize color as needed
+      };
+      this.worstTeamCombo = {
+        characters: worstTeam,
+        score: worstTeamScore,
+        teamColor: 'DC3545' // Customize color as needed
+      };
     }
   }
 
@@ -193,7 +201,8 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
           averagePlayPercentage: averagePlayPercentage,
           characterColor: character.color,
         };
-      });
+      })
+      .sort((a, b) => b.averagePlayPercentage - a.averagePlayPercentage);
   }
 
   private prepareScatterPlotChartData(): CustomScatterChartData {
@@ -261,8 +270,8 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   private determineBestAndWorstTeams() {
     const teamData = this.generateTeamComboData();
 
-    let bestTeam: string | null = null;
-    let worstTeam: string | null = null;
+    let bestTeam: string[] = [];
+    let worstTeam: string[] = [];
     let highestScore = -Infinity;
     let lowestScore = Infinity;
 
@@ -270,34 +279,18 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
       const { totalScore, occurrences } = teamData[teamCombo];
       const averageScore = totalScore / occurrences;
 
+      // Check for best team
       if (averageScore > highestScore) {
         highestScore = averageScore;
-        bestTeam = teamCombo;
+        bestTeam = teamCombo.split(', '); // Assuming teamCombo is a string of names separated by commas
       }
 
+      // Check for worst team
       if (averageScore < lowestScore) {
         lowestScore = averageScore;
-        worstTeam = teamCombo;
+        worstTeam = teamCombo.split(', '); // Same splitting here
       }
     });
-
-    // Assuming you have analytics data for each team
-    const bestTeamAnalytics = this.analytics.find(data =>
-      this.extractPrimaryWeapons(data.charactersUsed) === bestTeam
-    );
-    const worstTeamAnalytics = this.analytics.find(data =>
-      this.extractPrimaryWeapons(data.charactersUsed) === worstTeam
-    );
-
-    this.bestTeamCombo = bestTeamAnalytics ? {
-      team: this.extractPrimaryWeapons(bestTeamAnalytics.charactersUsed),
-      score: highestScore
-    } : null;
-
-    this.worstTeamCombo = worstTeamAnalytics ? {
-      team: this.extractPrimaryWeapons(worstTeamAnalytics.charactersUsed),
-      score: lowestScore
-    } : null;
 
     return {
       bestTeam,
