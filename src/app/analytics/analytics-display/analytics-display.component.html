@@ -9,16 +9,26 @@
   
     <div class="kpi-container">
         <!-- Average play % -->
-      <div class="kpi-box">
-        <h2>Average Play Percentage</h2>
-        <ul>
-            <li *ngFor="let character of averagePlayPercentages">
-                <span [style.color]="'#' + character.characterColor">{{ character.characterName }}: {{ character.averagePlayPercentage | number: '1.0-2' }}%</span>
-            </li>
-        </ul>
-      </div>
+        <div class="kpi-box">
+            <h2>Average Play Percentage</h2>
+            <ul>
+                <li *ngFor="let character of averagePlayPercentages">
+                    <span [style.color]="'#' + character.characterColor">{{ character.characterName }}: {{ character.averagePlayPercentage | number: '1.0-2' }}%</span>
+                </li>
+            </ul>
+        </div>
 
-      <div class="kpi-box">KPI 2</div>
+        <!-- Leader Percentages -->
+        <div class="kpi-box">
+            <h2>Leader Percentage</h2>
+            <ul>
+                <li *ngFor="let character of leaderPercentages">
+                    <span [style.color]="'#' + character.characterColor">
+                        {{ character.characterName }}: {{ character.leaderPercentage | number: '1.0-2' }}%
+                    </span>
+                </li>
+            </ul>
+        </div>    
 
         <!-- Best Team Combo -->
         <div class="kpi-box">

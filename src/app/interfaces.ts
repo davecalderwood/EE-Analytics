@@ -4,6 +4,7 @@ export interface CharacterKPI {
     characterName: string;
     averagePlayPercentage: number;
     characterColor: string;
+    leaderPercentage?: string;
 }
 
 export interface CustomScatterChartData extends ChartData<'scatter', (number | Point | null)[], unknown> {

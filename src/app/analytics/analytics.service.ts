@@ -41,7 +41,8 @@ export class AnalyticsService {
                                 equipmentName: equipment.moduleName,
                                 equipmentGUID: equipment.moduleGUID,
                                 imagePath: equipment.image
-                            })) as Equipment[]
+                            })) as Equipment[],
+                            leader: data.leader
                         } as AnalyticsData;
                     }),
                     maxData: analyticsData.maxData

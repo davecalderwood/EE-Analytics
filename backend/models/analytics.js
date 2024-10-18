@@ -24,6 +24,7 @@ const analyticsSchema = mongoose.Schema({
     scrapCount: { type: Number, required: true },
     levelReached: { type: Number, required: true },
     equipmentUsed: [equipmentSchema], // Updated to use equipmentSchema
+    leader: { type: String, required: true },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 

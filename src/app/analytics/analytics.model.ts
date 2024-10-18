@@ -20,4 +20,5 @@ export interface AnalyticsData {
     successfullyExtracted: boolean;
     scrapCount: number;
     levelReached: number;
+    leader: string;
 }

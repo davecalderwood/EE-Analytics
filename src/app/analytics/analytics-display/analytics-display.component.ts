@@ -47,6 +47,7 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
 
   // KPI data
   averagePlayPercentages: CharacterKPI[] = [];
+  leaderPercentages: CharacterKPI[] = [];
   bestTeamCombo: any;
   worstTeamCombo: any;
 
@@ -111,18 +112,19 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
       this.characterTimeSurvivedData();
       this.averagePlayPercentages = this.calculateAveragePlayPercentage();
       this.scatterPlotChartData = this.prepareScatterPlotChartData();
+      this.leaderPercentages = this.calculateLeaderPercentages();
 
       // Calculate best and worst team combos
       const { bestTeam, bestTeamScore, worstTeam, worstTeamScore } = this.determineBestAndWorstTeams();
       this.bestTeamCombo = {
         characters: bestTeam,
         score: bestTeamScore,
-        teamColor: '28A745' // Customize color as needed
+        teamColor: '28A745'
       };
       this.worstTeamCombo = {
         characters: worstTeam,
         score: worstTeamScore,
-        teamColor: 'DC3545' // Customize color as needed
+        teamColor: 'DC3545'
       };
     }
   }
@@ -300,33 +302,17 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     };
   }
 
-  // Helper method to extract primary weapons
-  private extractPrimaryWeapons(charactersUsed: CharacterUsed[]): string {
-    if (!this.characters) {
-      return ''; // Return empty if character data isn't loaded yet
-    }
-
-    return charactersUsed
-      .filter(characterUsed => {
-        const matchingCharacter = this.characters.find(
-          char => char.characterGUID === characterUsed.characterGUID // Compare using GUID
-        );
-
-        // Check if this character is identified as a primary weapon in the service data
-        return matchingCharacter && matchingCharacter.primaryWeapon;
-      })
-      .map(character => character.characterName) // Return names of primary weapon characters
-      .join(', ');
-  }
-
   private generateTeamComboData(): { [teamCombo: string]: { totalScore: number; occurrences: number } } {
     const teamData: { [teamCombo: string]: { totalScore: number; occurrences: number } } = {};
 
-    this.analytics.forEach((analyticsData, index) => {
+    this.analytics.forEach((analyticsData) => {
       // Extract characters used based on the characters listed as primary weapons
       const primaryWeaponCharacters = analyticsData.charactersUsed
         .filter(characterUsed => isPrimaryWeapon(characterUsed.characterGUID, this.characters))
-        .map(character => character.characterName);
+        .map(characterUsed => {
+          const character = this.characters.find(c => c.characterGUID === characterUsed.characterGUID);
+          return character ? character.characterName : characterUsed.characterGUID;
+        });
 
       // Create a unique key for the team
       const teamCombo = primaryWeaponCharacters.join(', ');
@@ -349,6 +335,36 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     const baseScore = survivalTime; // Base the score on survival time
     const extractionBonus = successfulExtractions ? 100 : 0; // Add a fixed bonus for successful extraction
     return baseScore + extractionBonus; // Combine both to get the final score
+  }
+
+  private calculateLeaderPercentages(): CharacterKPI[] {
+    const leaderCounts: { [key: string]: number } = {};
+
+    // Count leader occurrences
+    this.analytics.forEach((analyticsData) => {
+      const leaderGUID = analyticsData.leader;
+      if (leaderGUID) {
+        leaderCounts[leaderGUID] = (leaderCounts[leaderGUID] || 0) + 1;
+      }
+    });
+
+    const totalAnalytics = this.analytics.length;
+
+    // Prepare leader percentage data
+    return this.characters
+      .filter(character => character.primaryWeapon)
+      .map(character => {
+        const totalLeadsForCharacter = leaderCounts[character.characterGUID] || 0;
+        const leaderPercentage = totalAnalytics > 0 ? (totalLeadsForCharacter / totalAnalytics) * 100 : 0;
+
+        return {
+          characterName: character.characterName,
+          averagePlayPercentage: 0,
+          leaderPercentage: leaderPercentage.toString(),
+          characterColor: character.color,
+        };
+      })
+      .sort((a, b) => b.leaderPercentage.localeCompare(a.leaderPercentage, undefined, { numeric: true }));
   }
 
   onDelete(postId: string) {

@@ -15,7 +15,8 @@ exports.createAnalytics = (req, res, next) => {
         successfullyExtracted: req.body.successfullyExtracted,
         scrapCount: req.body.scrapCount,
         levelReached: req.body.levelReached,
-        equipmentUsed: req.body.equipmentUsed   // If you want to store equipmentUsed as well
+        equipmentUsed: req.body.equipmentUsed,
+        leader: req.body.leader
     });
 
     // Log the analyticsData object to check its contents
