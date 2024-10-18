@@ -1,11 +1,19 @@
 <div class="dashboard">
     <header class="header">
-      <h1 class="header-title">Analytics</h1>
-      <div class="filter-box">
-        <input type="text" placeholder="Search..." />
-        <button>Filter</button>
-      </div>
-    </header>
+        <h1 class="header-title">Analytics</h1>
+        <div class="filter-box">
+          <select [(ngModel)]="selectedDateRange">
+            <option value="30">Last 30 Days</option>
+            <option value="60">Last 60 Days</option>
+            <option value="90">Last 90 Days</option>
+            <option value="180">Last 180 Days</option>
+            <option value="365">Last 1 Year</option>
+            <option value="730">Last 2 Years</option>
+            <option value="all">All</option>
+          </select>
+          <button (click)="filterAnalytics()">Filter</button>
+        </div>
+      </header>      
   
     <div class="kpi-container">
         <!-- Average play % -->

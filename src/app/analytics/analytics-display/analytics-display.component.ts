@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AnalyticsService } from '../analytics.service';
 import { AnalyticsData, CharacterUsed } from '../analytics.model';
@@ -26,6 +26,7 @@ import { isPrimaryWeapon } from '../../shared/helperFunctions';
   styleUrls: ['./analytics-display.component.scss'],
 })
 export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
+  @ViewChild(GraphComponent) graphComponent!: GraphComponent;
   // Data properties
   analytics: AnalyticsData[] = [];
   characters: Character[] = [];
@@ -57,6 +58,10 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   private characterSub!: Subscription;
   private equipmentSub!: Subscription;
 
+  // Queries
+  selectedDateRange: string = '30';
+  private lastSelectedDateRange: string | null = null;
+
   constructor(
     public analyticsService: AnalyticsService,
     public characterService: CharacterService,
@@ -68,16 +73,26 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     // Services
     this.userId = this.authService.getUserId();
-    this.analyticsService.getAnalyticsData();
+    this.analyticsService.getAnalyticsData(this.selectedDateRange);
     this.characterService.getCharacters();
     this.equipmentService.getAllEquipment();
 
     // Analytics
     this.analyticsSub = this.analyticsService.getAnalyticsUpdateListener()
       .subscribe(({ analyticsData }: { analyticsData: AnalyticsData[]; dataCount: number }) => {
+        console.log(analyticsData);
         this.analytics = analyticsData;
         this.analyticsLoaded = true;
+
+        // Ensure that tryUpdateCharts is only called after data is available
         this.tryUpdateCharts();
+
+        // Update the chart only if graphComponent is available
+        if (this.graphComponent) {
+          this.graphComponent.updateChart();
+        }
+
+        this.isLoading = false;
       });
 
     // Characters
@@ -314,6 +329,9 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
           return character ? character.characterName : characterUsed.characterGUID;
         });
 
+      // Sort characters alphabetically to ensure consistency
+      primaryWeaponCharacters.sort();
+
       // Create a unique key for the team
       const teamCombo = primaryWeaponCharacters.join(', ');
 
@@ -367,18 +385,18 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
       .sort((a, b) => b.leaderPercentage.localeCompare(a.leaderPercentage, undefined, { numeric: true }));
   }
 
-  onDelete(postId: string) {
+  filterAnalytics() {
+    if (this.selectedDateRange === this.lastSelectedDateRange) {
+      // No change in date range, do nothing
+      return;
+    }
+
+    // Update the last selected date range
+    this.lastSelectedDateRange = this.selectedDateRange;
+
+    // Run the analytics data fetching only if the date range has changed
     this.isLoading = true;
-    this.analyticsService.deleteAnalytics(postId)
-      .subscribe({
-        next: () => {
-          this.analyticsService.getAnalyticsData();
-          this.isLoading = false;
-        },
-        error: () => {
-          this.isLoading = false;
-        }
-      });
+    this.analyticsService.getAnalyticsData(this.selectedDateRange);
   }
 
   ngOnDestroy(): void {

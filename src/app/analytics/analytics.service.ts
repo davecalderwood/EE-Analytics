@@ -17,9 +17,9 @@ export class AnalyticsService {
     constructor(private http: HttpClient, private router: Router) { }
 
     // Method to fetch analytics data with pagination
-    getAnalyticsData() {
-        //const queryParams = `?pageSize=${itemsPerPage}&page=${currentPage}`;
-        this.http.get<{ message: string, analytics: any, maxData: number }>(BACKEND_URL)
+    getAnalyticsData(dateRange: string) {
+        const queryParams = `?dateRange=${dateRange}`;
+        this.http.get<{ message: string, analytics: any, maxData: number }>(BACKEND_URL + queryParams)
             .pipe(map((analyticsData) => {
                 return {
                     analyticsData: analyticsData.analytics.map((data: any) => {

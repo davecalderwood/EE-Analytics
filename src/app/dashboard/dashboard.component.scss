@@ -79,8 +79,8 @@
     padding: 20px;
     border-radius: 6px;
     text-align: center;
-    border: 1px solid #ccc;
     height: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
   }
   
   .large-box-container {
@@ -97,8 +97,8 @@
     padding: 20px;
     border-radius: 6px;
     text-align: center;
-    border: 1px solid #ccc;
     height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
   }
   
   @media (min-width: 800px) {

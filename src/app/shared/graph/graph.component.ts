@@ -108,6 +108,15 @@ export class GraphComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  updateChart() {
+    if (this.chart) {
+      this.chart.data = this.chartData;
+      this.chart.update(); // Call Chart.js update method
+    } else {
+      this.createChart(); // Fallback to create the chart if it doesn't exist
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.chart) {
       this.chart.destroy();

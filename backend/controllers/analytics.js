@@ -66,15 +66,14 @@ exports.updateAnalytics = (req, res, next) => {
 
 // GET all analytics
 exports.getAnalytics = (req, res, next) => {
-    const pageSize = +req.query.pageSize;
-    const currentPage = +req.query.page;
+    const dateRange = req.query.dateRange;
     const analyticsQuery = Analytics.find();
     let fetchedAnalytics;
 
-    if (pageSize && currentPage) {
-        analyticsQuery
-            .skip(pageSize * (currentPage - 1))
-            .limit(pageSize);
+    if (dateRange && dateRange !== 'all') {
+        const dateLimit = new Date();
+        dateLimit.setDate(dateLimit.getDate() - +dateRange); // Subtract the number of days
+        analyticsQuery.where('createdAt').gte(dateLimit); // Assuming you have a 'createdAt' field
     }
 
     analyticsQuery
