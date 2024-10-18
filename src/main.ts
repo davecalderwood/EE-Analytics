@@ -14,11 +14,12 @@ import { AnalyticsCreateComponent } from './app/analytics/analytics-create/analy
 import { AnalyticsDisplayComponent } from './app/analytics/analytics-display/analytics-display.component';
 import { CharactersComponent } from './app/characters/characters.component';
 import { EquipmentComponent } from './app/equipment/equipment.component';
+import { DashboardComponent } from './app/dashboard/dashboard.component';
 
 const routes = [
-  { path: '', component: PostListComponent },
-  { path: 'create', component: PostCreateComponent, canActivate: [AuthGuard] },
-  { path: 'edit/:postId', component: PostCreateComponent, canActivate: [AuthGuard] },
+  { path: '', component: DashboardComponent },
+  // { path: 'create', component: PostCreateComponent, canActivate: [AuthGuard] },
+  // { path: 'edit/:postId', component: PostCreateComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   // Analytics
