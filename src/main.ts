@@ -21,7 +21,6 @@ const routes = [
   // { path: 'create', component: PostCreateComponent, canActivate: [AuthGuard] },
   // { path: 'edit/:postId', component: PostCreateComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
   // Analytics
   { path: 'analytics', component: AnalyticsDisplayComponent },
   { path: 'createAnalytics', component: AnalyticsCreateComponent, canActivate: [AuthGuard] },

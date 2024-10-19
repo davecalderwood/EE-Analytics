@@ -10,13 +10,16 @@
                 <a routerLink="/analytics" routerLinkActive="active">Analytics</a>
             </li>
             <li>
-                <a routerLink="/createAnalytics" routerLinkActive="active">Add New Analytics</a>
+                <a routerLink="/createAnalytics" routerLinkActive="active" *ngIf="userIsAuthenticated">Add New
+                    Analytics</a>
             </li>
             <li>
-                <a routerLink="/createCharacter" routerLinkActive="active">Add New Character</a>
+                <a routerLink="/createCharacter" routerLinkActive="active" *ngIf="userIsAuthenticated">Add New
+                    Character</a>
             </li>
             <li>
-                <a routerLink="/createEquipment" routerLinkActive="active">Add New Equipment</a>
+                <a routerLink="/createEquipment" routerLinkActive="active" *ngIf="userIsAuthenticated">Add New
+                    Equipment</a>
             </li>
         </ul>
     </mat-sidenav>
