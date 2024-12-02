@@ -2,14 +2,8 @@
     <span><a mat-button routerLink="/" routerLinkActive="mat-accent">Eldritch Escape</a></span>
     <span class="spacer"></span>
     <ul>
-        <!-- <li *ngIf="userIsAuthenticated">
-            <a mat-button routerLink="/create" routerLinkActive="mat-accent">New Post</a>
-        </li> -->
         <li *ngIf="!userIsAuthenticated">
             <a mat-button routerLink="/login" routerLinkActive="mat-accent">Login</a>
-        </li>
-        <li *ngIf="!userIsAuthenticated">
-            <a mat-button routerLink="/signup" routerLinkActive="mat-accent">Sign Up</a>
         </li>
         <li *ngIf="userIsAuthenticated">
             <a mat-button (click)="onLogout()">Logout</a>
