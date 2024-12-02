@@ -3,25 +3,31 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 exports.createUser = (req, res, next) => {
+    if (!req.body.email || !req.body.password) {
+        return res.status(400).json({ message: "Email and password are required." });
+    }
     bcrypt.hash(req.body.password, 10).then((hash) => {
         const user = new User({
             email: req.body.email,
-            password: hash
+            password: hash,
+            roles: req.body.roles || ['user']
         });
         user.save()
             .then(result => {
                 res.status(201).json({
                     message: 'User Created',
                     result: result
-                })
+                });
             })
             .catch(error => {
+                console.error("Error details:", error);
                 res.status(500).json({
-                    message: 'Invalid authentication credentials!'
+                    message: 'Failed to create user.',
+                    error: error.message
                 });
             });
     });
-}
+};
 
 exports.userLogin = (req, res, next) => {
     let fetchedUser;
@@ -44,7 +50,8 @@ exports.userLogin = (req, res, next) => {
             // Successful login -> create web token
             const token = jwt.sign({
                 email: fetchedUser.email,
-                userId: fetchedUser._id
+                userId: fetchedUser._id,
+                roles: fetchedUser.roles
             },
                 process.env.JWT_KEY,
                 { expiresIn: '1h' });

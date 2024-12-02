@@ -42,22 +42,22 @@
         <div class="kpi-box">
             <h2>Best Team Combo</h2>
             <ul>
-                <li *ngFor="let character of bestTeamCombo.characters">
+                <li *ngFor="let character of bestTeamCombo?.characters">
                     <span [style.color]="'#' + bestTeamCombo.teamColor">{{ character }}</span>
                 </li>
             </ul>
-            <p>Score: {{ bestTeamCombo.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
+            <p>Score: {{ bestTeamCombo?.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
         </div>
 
         <!-- Worst Team Combo -->
         <div class="kpi-box">
             <h2>Worst Team Combo</h2>
             <ul>
-                <li *ngFor="let character of worstTeamCombo.characters">
+                <li *ngFor="let character of worstTeamCombo?.characters">
                     <span [style.color]="'#' + worstTeamCombo.teamColor">{{ character }}</span>
                 </li>
             </ul>
-            <p>Score: {{ worstTeamCombo.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
+            <p>Score: {{ worstTeamCombo?.score | number: '1.0-0' }}</p> <!-- Round score to nearest whole number -->
         </div>
     </div>
   

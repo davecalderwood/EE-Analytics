@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AnalyticsService } from '../analytics.service';
 import { SharedModule } from '../../shared.module';
 import { AuthService } from '../../auth/auth.service';
@@ -27,7 +27,8 @@ export class AnalyticsCreateComponent implements OnInit, OnDestroy {
   constructor(
     public analyticsService: AnalyticsService,
     public route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -36,6 +37,10 @@ export class AnalyticsCreateComponent implements OnInit, OnDestroy {
       .subscribe(
         authStatus => {
           this.isLoading = false;
+
+          if (!this.authService.hasRole('admin')) {
+            this.router.navigate(['/']);  // Redirect to home if user does not have 'admin' role
+          }
         }
       );
     this.form = new FormGroup({

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SharedModule } from '../shared.module';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { mimeType } from '../mime-type.validator';
 import { CharacterService } from './character.service';
@@ -28,7 +28,8 @@ export class CharactersComponent implements OnInit, OnDestroy {
   constructor(
     public charactersService: CharacterService,
     public route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -37,6 +38,10 @@ export class CharactersComponent implements OnInit, OnDestroy {
       .subscribe(
         authStatus => {
           this.isLoading = false;
+
+          if (!this.authService.hasRole('admin')) {
+            this.router.navigate(['/']);  // Redirect to home if user does not have 'admin' role
+          }
         }
       );
     this.form = new FormGroup({

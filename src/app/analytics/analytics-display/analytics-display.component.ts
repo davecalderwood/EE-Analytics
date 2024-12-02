@@ -80,7 +80,6 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
     // Analytics
     this.analyticsSub = this.analyticsService.getAnalyticsUpdateListener()
       .subscribe(({ analyticsData }: { analyticsData: AnalyticsData[]; dataCount: number }) => {
-        console.log(analyticsData);
         this.analytics = analyticsData;
         this.analyticsLoaded = true;
 
@@ -350,9 +349,18 @@ export class AnalyticsDisplayComponent implements OnInit, OnDestroy {
   }
 
   private calculateTeamScore(successfulExtractions: boolean, survivalTime: number): number {
-    const baseScore = survivalTime; // Base the score on survival time
-    const extractionBonus = successfulExtractions ? 100 : 0; // Add a fixed bonus for successful extraction
-    return baseScore + extractionBonus; // Combine both to get the final score
+    const baseScore = survivalTime; // Base score based on survival time
+    const extractionMultiplier = this.calculateExtractionBonus(survivalTime); // Calculate bonus based on survival time
+    const extractionBonus = successfulExtractions ? extractionMultiplier : 0; // Apply bonus only if extraction was successful
+
+    return baseScore + extractionBonus;
+  }
+
+  private calculateExtractionBonus(survivalTime: number): number {
+    const minutesSurvived = Math.floor(survivalTime / 60);
+    const bonusPerMinute = 50;
+
+    return minutesSurvived * bonusPerMinute;
   }
 
   private calculateLeaderPercentages(): CharacterKPI[] {
